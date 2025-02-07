@@ -15,7 +15,7 @@ public class MakingChange {
      */
     public static long countWays(int target, int[] coins) {
         Arrays.sort(coins);
-        return memoizationSolution(target, coins);
+        return tabulationSolution(target, coins);
     }
 
     private static long memoizationSolution(int target, int[] coins) {
@@ -26,32 +26,48 @@ public class MakingChange {
 
     private static long tabulationSolution(int target, int[] coins) {
         long[][] vals = new long[coins.length][target + 1];
-        tabulatoi
+        tabulationIteration(target, coins, vals);
+        System.out.println(Arrays.deepToString(vals));
+        return vals[coins.length - 1][target];
     }
 
-    private static void tabulationRecurse
+    private static void tabulationIteration(int target, int[] coins, long[][] vals) {
+        for (int i = 0; i < coins.length; i++) {
+            vals[i][0] = 1;
+            for (int j = 1; j <= target; j++) {
+                long currentPaths = 0;
+                if (i - 1 >= 0) {
+                    currentPaths += vals[i - 1][j];
+                }
+                if (j - coins[i] >= 0) {
+                    currentPaths += vals[i][j - coins[i]];
+                }
+                vals[i][j] = currentPaths;
+            }
+        }
+    }
 
-    private static void memoizationRecurse(int currval, int[] coins, int currentCoin, long[][] vals) {
-        if (currval == 0) {
+    private static void memoizationRecurse(int currVal, int[] coins, int currentCoin, long[][] vals) {
+        if (currVal == 0) {
             vals[currentCoin][0] = 1;
             return;
         }
 
         long paths = 0;
 
-        if ((currval - coins[currentCoin]) >= 0) {
-            if (vals[currentCoin][currval - coins[currentCoin]] == 0) {
-                memoizationRecurse(currval - coins[currentCoin], coins, currentCoin, vals);
+        if ((currVal - coins[currentCoin]) >= 0) {
+            if (vals[currentCoin][currVal - coins[currentCoin]] == 0) {
+                memoizationRecurse(currVal - coins[currentCoin], coins, currentCoin, vals);
             }
-            paths += vals[currentCoin][currval - coins[currentCoin]];
+            paths += vals[currentCoin][currVal - coins[currentCoin]];
         }
         if (currentCoin > 0) {
-            if (vals[currentCoin - 1][currval] == 0) {
-                memoizationRecurse(currval, coins, currentCoin - 1, vals);
+            if (vals[currentCoin - 1][currVal] == 0) {
+                memoizationRecurse(currVal, coins, currentCoin - 1, vals);
             }
-            paths += vals[currentCoin - 1][currval];
+            paths += vals[currentCoin - 1][currVal];
         }
 
-        vals[currentCoin][currval] = paths;
+        vals[currentCoin][currVal] = paths;
     }
 }
